@@ -8,7 +8,7 @@ function NewsSection() {
     const [news, setNews] = useState([]);
 
     useEffect(() => {
-        const apiUrl = 'http://localhost:8080/news?page=0&size=3&sort=publicationDate,desc';
+        const apiUrl = '/api/news?page=0&size=3&sort=publicationDate,desc';
         axios.get(apiUrl)
             .then(response => {
                 setNews(response.data.content);

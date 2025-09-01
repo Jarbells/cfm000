@@ -9,7 +9,7 @@ function SchedulePage() {
 
     useEffect(() => {
         // Buscamos todos os programas (a paginação padrão trará os primeiros)
-        axios.get('http://localhost:8080/programas?sort=startTime,asc&size=100') // Aumentamos o size para garantir que vêm todos
+        axios.get('/api/programas?sort=startTime,asc&size=100') // Aumentamos o size para garantir que vêm todos
             .then(response => {
                 // A CORREÇÃO ESTÁ AQUI: Extraímos a lista de dentro da propriedade 'content'
                 setPrograms(response.data.content);

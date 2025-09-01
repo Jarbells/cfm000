@@ -12,7 +12,7 @@ function ManagePrograms() {
 
     const fetchPrograms = () => {
         // Adicionamos o parâmetro size=200 para garantir que todos os programas são listados no painel
-        axios.get('http://localhost:8080/programas?size=200&sort=startTime,asc')
+        axios.get('/api/programas?size=200&sort=startTime,asc')
             .then(response => {
                 // A CORREÇÃO ESTÁ AQUI: Extraímos a lista de dentro da propriedade 'content'
                 setPrograms(response.data.content);
@@ -28,7 +28,7 @@ function ManagePrograms() {
 
     const handleDeleteProgram = (id) => {
         if (window.confirm('Tem certeza que deseja excluir este programa?')) {
-            axios.delete(`http://localhost:8080/programas/${id}`)
+            axios.delete(`/api/programas/${id}`)
                 .then(() => {
                     alert('Programa excluído com sucesso!');
                     fetchPrograms();
@@ -41,7 +41,7 @@ function ManagePrograms() {
     };
 
     const handleUpdateProgram = (id, updatedProgram) => {
-        axios.put(`http://localhost:8080/programas/${id}`, updatedProgram)
+        axios.put(`/api/programas/${id}`, updatedProgram)
             .then(() => {
                 alert('Programa atualizado com sucesso!');
                 setEditingProgram(null);

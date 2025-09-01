@@ -8,7 +8,7 @@ function ManageRadioInfo() {
     const [radioInfo, setRadioInfo] = useState(null);
 
     const fetchRadioInfo = () => {
-        axios.get('http://localhost:8080/radio-info')
+        axios.get('/api/radio-info')
             .then(response => {
                 setRadioInfo(response.data);
             })
@@ -25,7 +25,7 @@ function ManageRadioInfo() {
         // A CORREÇÃO CRUCIAL ESTÁ AQUI:
         // Garantimos que o URL inclui o ID da informação que estamos a atualizar.
         // O objeto 'updatedInfo' já contém o ID que veio da API.
-        axios.put(`http://localhost:8080/radio-info/${updatedInfo.id}`, updatedInfo)
+        axios.put(`/api/radio-info/${updatedInfo.id}`, updatedInfo)
             .then(() => {
                 alert('Informações da rádio atualizadas com sucesso!');
                 fetchRadioInfo();

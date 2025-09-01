@@ -29,7 +29,7 @@ public class Locutor {
     @Column(columnDefinition = "TEXT") // Ideal para textos longos
     private String bio;
 
-    @Column(name = "photo_url")
+    @Column(name = "photo_url", length = 1024)
     private String photoUrl;
 
     @JsonIgnore

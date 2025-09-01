@@ -17,9 +17,9 @@ function AddProgramForm({ onProgramAdded }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/locutores')
+        axios.get('/api/locutores')
             .then(response => {
-                setAllLocutores(response.data);
+                setAllLocutores(response.data.content);
             })
             .catch(error => {
                 console.error("Erro ao buscar locutores para o formulário!", error);
@@ -59,7 +59,7 @@ function AddProgramForm({ onProgramAdded }) {
             imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
         };
 
-        axios.post('http://localhost:8080/programas', dataToSend)
+        axios.post('/api/programas', dataToSend)
             .then(() => {
                 alert('Programa cadastrado com sucesso!');
                 onProgramAdded();

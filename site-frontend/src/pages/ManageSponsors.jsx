@@ -11,9 +11,9 @@ function ManageSponsors() {
     const [editingSponsor, setEditingSponsor] = useState(null);
 
     const fetchSponsors = () => {
-        axios.get('http://localhost:8080/sponsors')
+        axios.get('/api/sponsors')
             .then(response => {
-                setSponsors(response.data);
+                setSponsors(response.data.content);
             })
             .catch(error => {
                 console.error("Houve um erro ao buscar os patrocinadores!", error);
@@ -26,7 +26,7 @@ function ManageSponsors() {
 
     const handleDeleteSponsor = (id) => {
         if (window.confirm('Tem certeza que deseja excluir este patrocinador?')) {
-            axios.delete(`http://localhost:8080/sponsors/${id}`)
+            axios.delete(`/api/sponsors/${id}`)
                 .then(() => {
                     alert('Patrocinador excluído com sucesso!');
                     fetchSponsors();
@@ -39,7 +39,7 @@ function ManageSponsors() {
     };
 
     const handleUpdateSponsor = (id, updatedSponsor) => {
-        axios.put(`http://localhost:8080/sponsors/${id}`, updatedSponsor)
+        axios.put(`/api/sponsors/${id}`, updatedSponsor)
             .then(() => {
                 alert('Patrocinador atualizado com sucesso!');
                 setEditingSponsor(null);

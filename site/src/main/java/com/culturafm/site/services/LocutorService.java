@@ -2,19 +2,21 @@
 
 package com.culturafm.site.services;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.culturafm.site.dto.LocutorDTO;
 import com.culturafm.site.entities.Locutor;
 import com.culturafm.site.repository.LocutorRepository;
 import com.culturafm.site.services.exceptions.ResourceNotFoundException;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class LocutorService {
@@ -23,10 +25,16 @@ public class LocutorService {
     private LocutorRepository repository;
 
     @Transactional(readOnly = true)
+    public Page<LocutorDTO> findAll(Pageable pageable) {
+        Page<Locutor> page = repository.findAll(pageable);
+        return page.map(LocutorDTO::new);
+    }    
+    
+    /* @Transactional(readOnly = true)
     public List<LocutorDTO> findAll() {
         List<Locutor> list = repository.findAll();
         return list.stream().map(LocutorDTO::new).collect(Collectors.toList());
-    }
+    } */
 
     @Transactional(readOnly = true)
     public LocutorDTO findById(Long id) {

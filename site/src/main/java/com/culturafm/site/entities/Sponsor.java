@@ -19,7 +19,7 @@ public class Sponsor {
     @Column(nullable = false) // O nome é obrigatório
     private String name;
 
-    @Column(name = "logo_url", nullable = false) // A URL do logo também é obrigatória
+    @Column(name = "logo_url", nullable = false, length = 1024) // A URL do logo também é obrigatória
     private String logoUrl;
 
     @Column(name = "website_url")

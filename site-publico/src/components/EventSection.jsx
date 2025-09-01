@@ -8,7 +8,7 @@ function EventSection() {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        const apiUrl = 'http://localhost:8080/events?page=0&size=3&sort=eventDate,asc';
+        const apiUrl = '/api/events?page=0&size=3&sort=eventDate,asc';
         axios.get(apiUrl)
             .then(response => { setEvents(response.data.content); })
             .catch(error => { console.error("Houve um erro ao buscar os eventos!", error); });

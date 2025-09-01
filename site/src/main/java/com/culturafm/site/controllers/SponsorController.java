@@ -1,14 +1,23 @@
 package com.culturafm.site.controllers;
 
-import com.culturafm.site.dto.SponsorDTO;
-import com.culturafm.site.services.SponsorService;
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.util.List;
+import com.culturafm.site.dto.SponsorDTO;
+import com.culturafm.site.services.SponsorService;
 
 @RestController
 @RequestMapping(value = "/sponsors")
@@ -20,10 +29,16 @@ public class SponsorController {
     private SponsorService service;
 
     @GetMapping
+    public ResponseEntity<Page<SponsorDTO>> findAll(Pageable pageable) {
+        Page<SponsorDTO> page = service.findAll(pageable);
+        return ResponseEntity.ok().body(page);
+    }
+    
+    /* @GetMapping
     public ResponseEntity<List<SponsorDTO>> findAll() {
         List<SponsorDTO> list = service.findAll();
         return ResponseEntity.ok().body(list);
-    }
+    } */
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<SponsorDTO> findById(@PathVariable Long id) {

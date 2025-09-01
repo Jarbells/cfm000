@@ -20,7 +20,7 @@ public class RadioInfo {
 
     private String slogan;
 
-    @Column(name = "logo_url")
+    @Column(name = "logo_url", length = 1024)
     private String logoUrl;
 
     // --- CAMPOS EXISTENTES ---

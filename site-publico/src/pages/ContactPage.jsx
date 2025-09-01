@@ -9,7 +9,7 @@ function ContactPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/radio-info')
+        axios.get('/api/radio-info')
             .then(response => {
                 setInfo(response.data);
                 setLoading(false);

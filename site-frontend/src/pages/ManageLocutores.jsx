@@ -11,9 +11,9 @@ function ManageLocutores() {
   const [editingLocutor, setEditingLocutor] = useState(null);
 
   const fetchLocutores = () => {
-    axios.get('http://localhost:8080/locutores')
-      .then(response => setLocutores(response.data))
-      .catch(error => console.error("Houve um erro ao buscar os locutores!", error));
+    axios.get('/api/locutores')
+      .then(response => setLocutores(response.data.content))
+      .catch(error => console.error("Houve um erro ao buscar os locutores!", error));        
   };
 
   useEffect(() => {
@@ -22,7 +22,7 @@ function ManageLocutores() {
 
   const handleDeleteLocutor = (id) => {
     if (window.confirm('Tem certeza que deseja excluir este locutor?')) {
-      axios.delete(`http://localhost:8080/locutores/${id}`)
+      axios.delete(`/api/locutores/${id}`)
         .then(() => {
           alert('Locutor excluído com sucesso!');
           fetchLocutores();
@@ -43,7 +43,7 @@ function ManageLocutores() {
   };
 
   const handleUpdateLocutor = (id, updatedLocutor) => {
-    axios.put(`http://localhost:8080/locutores/${id}`, updatedLocutor)
+    axios.put(`/api/locutores/${id}`, updatedLocutor)
       .then(() => {
         alert('Locutor atualizado com sucesso!');
         setEditingLocutor(null);

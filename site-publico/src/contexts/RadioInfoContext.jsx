@@ -11,7 +11,7 @@ export function RadioInfoProvider({ children }) {
     const [radioInfo, setRadioInfo] = useState(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/radio-info')
+        axios.get('/api/radio-info')
             .then(response => {
                 setRadioInfo(response.data);
             })

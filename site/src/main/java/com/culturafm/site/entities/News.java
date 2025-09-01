@@ -21,7 +21,7 @@ public class News {
 
     private String author;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 1024)
     private String imageUrl;
 
     @Column(name = "publication_date")

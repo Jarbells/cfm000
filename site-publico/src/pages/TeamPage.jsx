@@ -10,9 +10,9 @@ function TeamPage() {
 
     useEffect(() => {
         // Busca todos os locutores, ordenados por nome
-        axios.get('http://localhost:8080/locutores?sort=name,asc')
+        axios.get('/api/locutores?sort=name,asc')
             .then(response => {
-                setLocutores(response.data);
+                setLocutores(response.data.content);
                 setLoading(false);
             })
             .catch(error => {

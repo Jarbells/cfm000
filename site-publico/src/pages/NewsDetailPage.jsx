@@ -11,7 +11,7 @@ function NewsDetailPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const apiUrl = `http://localhost:8080/news/${id}`;
+        const apiUrl = `/api/news/${id}`;
         
         axios.get(apiUrl)
             .then(response => {

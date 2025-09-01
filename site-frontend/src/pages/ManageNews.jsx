@@ -7,13 +7,16 @@ import AddNewsForm from '../components/AddNewsForm';
 import EditNewsForm from '../components/EditNewsForm';
 
 function ManageNews() {
-    const [newsItems, setNewsItems] = useState([]);
+    // 1. O estado agora armazena o objeto de página completo
+    const [newsPage, setNewsPage] = useState({ content: [], number: 0, totalPages: 0 });
     const [editingNews, setEditingNews] = useState(null);
 
-    const fetchNews = () => {
-        axios.get('http://localhost:8080/news?sort=publicationDate,desc')
+    // 2. A função agora aceita um número de página
+    const fetchNews = (page = 0) => {
+        // Vamos definir um tamanho de página menor para o painel, por exemplo, 5
+        axios.get(`/api/news?page=${page}&size=5&sort=publicationDate,desc`)
             .then(response => {
-                setNewsItems(response.data.content);
+                setNewsPage(response.data); // Armazena o objeto de página inteiro
             })
             .catch(error => {
                 console.error("Houve um erro ao buscar as notícias!", error);
@@ -24,12 +27,14 @@ function ManageNews() {
         fetchNews();
     }, []);
 
+    // ... (as funções handleDelete, handleUpdate, etc. não mudam)
     const handleDeleteNews = (id) => {
         if (window.confirm('Tem certeza que deseja excluir esta notícia?')) {
-            axios.delete(`http://localhost:8080/news/${id}`)
+            axios.delete(`/api/news/${id}`)
                 .then(() => {
                     alert('Notícia excluída com sucesso!');
-                    fetchNews();
+                    // Recarrega a página atual após a exclusão
+                    fetchNews(newsPage.number);
                 })
                 .catch(error => {
                     alert('Erro ao excluir a notícia.');
@@ -37,13 +42,13 @@ function ManageNews() {
                 });
         }
     };
-
+    
     const handleUpdateNews = (id, updatedNews) => {
-        axios.put(`http://localhost:8080/news/${id}`, updatedNews)
+        axios.put(`/api/news/${id}`, updatedNews)
             .then(() => {
                 alert('Notícia atualizada com sucesso!');
                 setEditingNews(null);
-                fetchNews();
+                fetchNews(newsPage.number);
             })
             .catch(error => {
                 alert('Erro ao atualizar a notícia.');
@@ -59,6 +64,7 @@ function ManageNews() {
         setEditingNews(null);
     };
 
+
     return (
         <div>
             {editingNews ? (
@@ -68,14 +74,34 @@ function ManageNews() {
                     onCancel={handleCancelEdit}
                 />
             ) : (
-                <AddNewsForm onNewsAdded={fetchNews} />
+                <AddNewsForm onNewsAdded={() => fetchNews(0)} />
             )}
             <hr />
+            {/* 3. Passamos a lista de notícias (newsPage.content) para o componente NewsList */}
             <NewsList 
-                newsItems={newsItems}
+                newsItems={newsPage.content}
                 onDelete={handleDeleteNews}
                 onEdit={handleEditClick}
             />
+
+            {/* 4. Adicionamos os controlos de paginação */}
+            <div className="pagination-controls">
+                <button 
+                    onClick={() => fetchNews(newsPage.number - 1)} 
+                    disabled={newsPage.first}
+                >
+                    Anterior
+                </button>
+                <span>
+                    Página {newsPage.number + 1} de {newsPage.totalPages}
+                </span>
+                <button 
+                    onClick={() => fetchNews(newsPage.number + 1)} 
+                    disabled={newsPage.last}
+                >
+                    Próxima
+                </button>
+            </div>
         </div>
     );
 }

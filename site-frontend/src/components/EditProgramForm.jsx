@@ -14,9 +14,9 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/locutores')
+        axios.get('/api/locutores')
             .then(response => {
-                setAllLocutores(response.data);
+                setAllLocutores(response.data.content);
             })
             .catch(error => {
                 console.error("Erro ao buscar locutores!", error);

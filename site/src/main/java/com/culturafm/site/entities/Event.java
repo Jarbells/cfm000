@@ -20,7 +20,7 @@ public class Event {
 
     private String location;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 1024)
     private String imageUrl;
 
     @Column(name = "event_date")

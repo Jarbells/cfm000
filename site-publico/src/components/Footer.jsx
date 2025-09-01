@@ -50,6 +50,7 @@ function Footer() {
         </div>
         <div className="border-t border-gray-800 mt-8 pt-4 text-center text-gray-500 text-sm">
           <p>&copy; 2025 {info.radioName}. Todos os direitos reservados.</p>
+          <p className="mt-1">Desenvolvido por Jarbas Santos</p>
         </div>
       </div>
     </footer>

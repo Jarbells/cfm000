@@ -10,7 +10,7 @@ function NewsListPage() {
 
     const fetchNews = (page = 0) => {
         setLoading(true);
-        axios.get(`http://localhost:8080/news?page=${page}&size=6&sort=publicationDate,desc`)
+        axios.get(`/api/news?page=${page}&size=6&sort=publicationDate,desc`)
             .then(response => {
                 setNewsPage(response.data);
                 setLoading(false);

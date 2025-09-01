@@ -35,7 +35,7 @@ function OnAirSection() {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8080/programas?size=100') // Busca todos os programas
+        axios.get('/api/programas?size=100') // Busca todos os programas
             .then(response => {
                 // A CORREÇÃO ESTÁ AQUI: Extraímos a lista de dentro da propriedade 'content'
                 const allPrograms = response.data.content;

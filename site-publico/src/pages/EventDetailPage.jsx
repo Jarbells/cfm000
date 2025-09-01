@@ -11,7 +11,7 @@ function EventDetailPage() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const apiUrl = `http://localhost:8080/events/${id}`;
+        const apiUrl = `/api/events/${id}`;
         
         axios.get(apiUrl)
             .then(response => {

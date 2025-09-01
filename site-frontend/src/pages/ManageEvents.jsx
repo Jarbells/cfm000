@@ -7,14 +7,13 @@ import AddEventForm from '../components/AddEventForm';
 import EditEventForm from '../components/EditEventForm';
 
 function ManageEvents() {
-    const [eventItems, setEventItems] = useState([]);
+    const [eventPage, setEventPage] = useState({ content: [], number: 0, totalPages: 0 });
     const [editingEvent, setEditingEvent] = useState(null);
 
-    const fetchEvents = () => {
-        // Lembre-se de adicionar @CrossOrigin no EventController!
-        axios.get('http://localhost:8080/events?sort=eventDate,asc') // Busca os eventos mais próximos primeiro
+    const fetchEvents = (page = 0) => {
+        axios.get(`/api/events?page=${page}&size=5&sort=eventDate,asc`)
             .then(response => {
-                setEventItems(response.data.content);
+                setEventPage(response.data);
             })
             .catch(error => {
                 console.error("Houve um erro ao buscar os eventos!", error);
@@ -24,13 +23,14 @@ function ManageEvents() {
     useEffect(() => {
         fetchEvents();
     }, []);
-
+    
+    // ... (as outras funções handle... permanecem muito semelhantes)
     const handleDeleteEvent = (id) => {
         if (window.confirm('Tem certeza que deseja excluir este evento?')) {
-            axios.delete(`http://localhost:8080/events/${id}`)
+            axios.delete(`/api/events/${id}`)
                 .then(() => {
                     alert('Evento excluído com sucesso!');
-                    fetchEvents();
+                    fetchEvents(eventPage.number);
                 })
                 .catch(error => {
                     alert('Erro ao excluir o evento.');
@@ -38,20 +38,20 @@ function ManageEvents() {
                 });
         }
     };
-
+    
     const handleUpdateEvent = (id, updatedEvent) => {
-        axios.put(`http://localhost:8080/events/${id}`, updatedEvent)
+        axios.put(`/api/events/${id}`, updatedEvent)
             .then(() => {
                 alert('Evento atualizado com sucesso!');
                 setEditingEvent(null);
-                fetchEvents();
+                fetchEvents(eventPage.number);
             })
             .catch(error => {
                 alert('Erro ao atualizar o evento.');
                 console.error("Houve um erro ao atualizar o evento!", error);
             });
     };
-
+    
     const handleEditClick = (event) => {
         setEditingEvent(event);
     };
@@ -59,6 +59,7 @@ function ManageEvents() {
     const handleCancelEdit = () => {
         setEditingEvent(null);
     };
+
 
     return (
         <div>
@@ -69,14 +70,32 @@ function ManageEvents() {
                     onCancel={handleCancelEdit}
                 />
             ) : (
-                <AddEventForm onEventAdded={fetchEvents} />
+                <AddEventForm onEventAdded={() => fetchEvents(0)} />
             )}
             <hr />
             <EventList 
-                eventItems={eventItems}
+                eventItems={eventPage.content}
                 onDelete={handleDeleteEvent}
                 onEdit={handleEditClick}
             />
+            {/* Controles de paginação para eventos */}
+            <div className="pagination-controls">
+                <button 
+                    onClick={() => fetchEvents(eventPage.number - 1)} 
+                    disabled={eventPage.first}
+                >
+                    Anterior
+                </button>
+                <span>
+                    Página {eventPage.number + 1} de {eventPage.totalPages}
+                </span>
+                <button 
+                    onClick={() => fetchEvents(eventPage.number + 1)} 
+                    disabled={eventPage.last}
+                >
+                    Próxima
+                </button>
+            </div>
         </div>
     );
 }

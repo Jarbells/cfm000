@@ -138,3 +138,54 @@ button[type="submit"]:hover {
     gap: 8px;
     color: #f0f0f0;
 }
+
+/* Estilos para a Página de Login */
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1e1e1e;
+}
+
+.login-box {
+    padding: 40px;
+    background-color: #2e2e2e;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h2 {
+    color: #ffa500;
+    margin-bottom: 25px;
+}
+
+/* Estilos para os Controles de Paginação */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding: 10px;
+}
+
+.pagination-controls button {
+    background-color: #4a4a4a;
+    color: #f0f0f0;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: #5a5a5a;
+}
+
+.pagination-controls button:disabled {
+    background-color: #3a3a3a;
+    color: #6a6a6a;
+    cursor: not-allowed;
+    transform: none;
+}

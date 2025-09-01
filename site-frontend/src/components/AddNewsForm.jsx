@@ -22,7 +22,7 @@ function AddNewsForm({ onNewsAdded }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8080/news', formData)
+        axios.post('/api/news', formData)
             .then(() => {
                 alert('Notícia cadastrada com sucesso!');
                 onNewsAdded();

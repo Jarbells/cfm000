@@ -15,10 +15,10 @@ function SponsorSection() {
     const [sponsors, setSponsors] = useState([]);
 
     useEffect(() => {
-        const apiUrl = 'http://localhost:8080/sponsors';
+        const apiUrl = '/api/sponsors';
         axios.get(apiUrl)
             .then(response => {
-                setSponsors(response.data);
+                setSponsors(response.data.content);
             })
             .catch(error => {
                 console.error("Houve um erro ao buscar os patrocinadores!", error);

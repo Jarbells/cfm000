@@ -27,7 +27,7 @@ function AddLocutorForm({ onLocutorAdded }) {
             return;
         }
 
-        const apiUrl = 'http://localhost:8080/locutores';
+        const apiUrl = '/api/locutores';
 
         axios.post(apiUrl, formData)
             .then(response => {

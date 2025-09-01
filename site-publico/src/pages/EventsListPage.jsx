@@ -10,7 +10,7 @@ function EventsListPage() {
 
     const fetchEvents = (page = 0) => {
         setLoading(true);
-        axios.get(`http://localhost:8080/events?page=${page}&size=5&sort=eventDate,asc`)
+        axios.get(`/api/events?page=${page}&size=5&sort=eventDate,asc`)
             .then(response => {
                 setEventsPage(response.data);
                 setLoading(false);

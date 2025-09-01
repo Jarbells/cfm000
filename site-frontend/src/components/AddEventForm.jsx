@@ -25,7 +25,7 @@ function AddEventForm({ onEventAdded }) {
             eventDate: new Date(formData.eventDate).toISOString()
         };
 
-        axios.post('http://localhost:8080/events', dataToSend)
+        axios.post('/api/events', dataToSend)
             .then(() => {
                 alert('Evento cadastrado com sucesso!');
                 onEventAdded();

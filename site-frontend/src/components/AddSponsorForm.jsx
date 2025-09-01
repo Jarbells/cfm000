@@ -18,7 +18,7 @@ function AddSponsorForm({ onSponsorAdded }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axios.post('http://localhost:8080/sponsors', formData)
+        axios.post('/api/sponsors', formData)
             .then(() => {
                 alert('Patrocinador cadastrado com sucesso!');
                 onSponsorAdded();
