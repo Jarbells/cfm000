@@ -10,13 +10,19 @@ function Header() {
   const firstWord = radioNameParts[0];
   const restOfName = radioNameParts.slice(1).join(' ');
 
+  // Função que abre a janela pop-up do leitor de rádio
+  const openPlayer = () => {
+  const playerWindow = window.open('/player', 'CulturaFMPlayer', 'width=350,height=180,menubar=no,toolbar=no,location=no,status=no');
+    if (playerWindow) {
+        playerWindow.focus();
+    }
+  };
+
   return (
-    // Ajuste no padding vertical para equilibrar com o novo tamanho do logo
     <header className="bg-[#181818] sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold text-white flex items-center gap-3">
           {radioInfo?.logoUrl && (
-            // AQUI ESTÁ A MUDANÇA: h-8 para h-10
             <img src={radioInfo.logoUrl} alt="Logótipo da Rádio" className="h-24" />
           )}
           {!radioInfo?.logoUrl && (
@@ -33,9 +39,15 @@ function Header() {
           <Link to="/equipe" className="text-gray-300 hover:text-white transition duration-300">Equipe</Link>
           <Link to="/contato" className="text-gray-300 hover:text-white transition duration-300">Contato</Link>
         </nav>
-        <a href="#" className="bg-[#FFA500] text-black font-bold py-2 px-5 rounded-full hover:bg-orange-400 transition duration-300 transform hover:scale-105">
+        
+        {/* BOTÃO CORRIGIDO: Agora é um <button> que chama a função openPlayer */}
+        <button 
+          onClick={openPlayer} 
+          className="bg-[#FFA500] text-black font-bold py-2 px-5 rounded-full hover:bg-orange-400 transition duration-300 transform hover:scale-105"
+        >
           Ouça Ao Vivo
-        </a>
+        </button>
+
       </div>
     </header>
   );

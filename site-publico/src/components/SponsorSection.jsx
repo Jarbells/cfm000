@@ -18,7 +18,15 @@ function SponsorSection() {
         const apiUrl = '/api/sponsors';
         axios.get(apiUrl)
             .then(response => {
-                setSponsors(response.data.content);
+                // VERIFICAÇÃO DE SEGURANÇA:
+                // Se a resposta do backend for um objeto paginado (que tem a propriedade 'content')
+                if (response.data && Array.isArray(response.data.content)) {
+                    setSponsors(response.data.content);
+                } 
+                // Se for uma lista simples (para ser mais robusto)
+                else if (Array.isArray(response.data)) {
+                    setSponsors(response.data);
+                }
             })
             .catch(error => {
                 console.error("Houve um erro ao buscar os patrocinadores!", error);

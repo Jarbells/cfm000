@@ -33,8 +33,13 @@ function Footer() {
             <ul className="text-gray-400 space-y-1">
               <li>{info.addressStreet}, {info.addressNumber}</li>
               <li>{info.addressCity}, {info.addressState}</li>
+              {info.addressZipCode && <li>CEP: {info.addressZipCode}</li>}
               <li>Telefone: {info.phonePrimary}</li>
-              {info.phoneWhatsapp && <li>WhatsApp: {info.phoneWhatsapp}</li>}
+              {info.phoneWhatsapp && 
+                <li>
+                  WhatsApp: <a href={`https://wa.me/${info.phoneWhatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:underline">{info.phoneWhatsapp}</a>
+                </li>
+              }              
               <li>{info.emailContact}</li>
             </ul>
           </div>

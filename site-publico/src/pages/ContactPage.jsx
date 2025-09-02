@@ -27,9 +27,9 @@ function ContactPage() {
     if (!info) {
         return <div className="container mx-auto px-4 py-12 text-center">Não foi possível carregar as informações de contato.</div>;
     }
-
-    const fullAddress = `${info.addressStreet}, ${info.addressNumber} - ${info.addressNeighborhood}, ${info.addressCity} - ${info.addressState}`;
-
+    
+    const fullAddress = `${info.addressStreet}, ${info.addressNumber} - ${info.addressNeighborhood}, ${info.addressCity} - ${info.addressState}, CEP: ${info.addressZipCode}`;
+    
     return (
         <main className="container mx-auto px-4 py-12">
             <h1 className="text-4xl font-black text-white mb-8 border-l-4 border-[#FFA500] pl-4">Fale Conosco</h1>
@@ -40,7 +40,13 @@ function ContactPage() {
                     <div>
                         <h2 className="text-2xl font-bold text-[#FFA500] mb-3">Nossos Contatos</h2>
                         <p className="text-lg text-gray-300"><strong>Telefone:</strong> {info.phonePrimary || 'Não informado'}</p>
-                        <p className="text-lg text-gray-300"><strong>WhatsApp:</strong> {info.phoneWhatsapp || 'Não informado'}</p>
+                        <p className="text-lg text-gray-300">
+                        <strong>WhatsApp:</strong> 
+                        {info.phoneWhatsapp ? 
+                            <a href={`https://wa.me/${info.phoneWhatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:underline"> {info.phoneWhatsapp}</a>
+                            : ' Não informado'
+                        }
+                        </p>
                         <p className="text-lg text-gray-300"><strong>E-mail:</strong> {info.emailContact || 'Não informado'}</p>
                     </div>
                     
