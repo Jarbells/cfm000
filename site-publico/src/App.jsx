@@ -29,9 +29,7 @@ const MainLayout = ({ children, isPlaying, togglePlay }) => (
 function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
-  const streamUrl = '/radio/stream'; // ANTES: 'https://stm2.stream2.com.br:8476/stream'
-
-  // const streamUrl = 'https://stm2.stream2.com.br:8476/stream';
+  const streamUrl = 'https://stm2.stream2.com.br:8476/stream';
 
   const togglePlay = () => {
     if (isPlaying) {
