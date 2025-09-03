@@ -3,21 +3,31 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Padrão de Segunda a Domingo
+const daysOfWeekOptions = [
+    { id: 'Segunda', label: 'Seg' },
+    { id: 'Terça',   label: 'Ter' },
+    { id: 'Quarta',  label: 'Qua' },
+    { id: 'Quinta',  label: 'Qui' },
+    { id: 'Sexta',   label: 'Sex' },
+    { id: 'Sábado',  label: 'Sab' },
+    { id: 'Domingo', label: 'Dom' }
+];
+
 function AddProgramForm({ onProgramAdded }) {
-    // O estado agora contém 'imageUrls' como um array desde o início
     const [formData, setFormData] = useState({
         name: '',
-        daysOfWeek: '',
         startTime: '',
         endTime: '',
         imageUrls: [],
         announcers: []
     });
-
+    const [selectedDays, setSelectedDays] = useState([]);
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/locutores')
+        // A CORREÇÃO ESTÁ AQUI: Adicionado '&sort=name,asc' para ordenar por nome
+        axios.get('/api/locutores?size=200&sort=name,asc') 
             .then(response => {
                 setAllLocutores(response.data.content);
             })
@@ -30,8 +40,15 @@ function AddProgramForm({ onProgramAdded }) {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+    
+    const handleDayChange = (dayId) => {
+        setSelectedDays(prevDays =>
+            prevDays.includes(dayId)
+                ? prevDays.filter(d => d !== dayId)
+                : [...prevDays, dayId]
+        );
+    };
 
-    // CORREÇÃO: Lógica para o campo de texto das imagens
     const handleImageUrlsChange = (e) => {
         const urls = e.target.value.split('\n');
         setFormData(prev => ({ ...prev, imageUrls: urls }));
@@ -53,9 +70,15 @@ function AddProgramForm({ onProgramAdded }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Filtra URLs vazias antes de enviar
+        
+        if (selectedDays.length === 0) {
+            alert('Por favor, selecione pelo menos um dia da semana.');
+            return;
+        }
+
         const dataToSend = {
             ...formData,
+            daysOfWeek: selectedDays.join(','), // Transforma o array em string: "Segunda,Sexta"
             imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
         };
 
@@ -63,11 +86,13 @@ function AddProgramForm({ onProgramAdded }) {
             .then(() => {
                 alert('Programa cadastrado com sucesso!');
                 onProgramAdded();
-                setFormData({ name: '', daysOfWeek: '', startTime: '', endTime: '', imageUrls: [], announcers: [] });
+                setFormData({ name: '', startTime: '', endTime: '', imageUrls: [], announcers: [] });
+                setSelectedDays([]);
             })
             .catch(error => {
                 console.error("Erro ao cadastrar programa!", error);
-                alert('Erro ao cadastrar o programa.');
+                const errorMsg = error.response?.data?.message || 'Erro ao cadastrar o programa.';
+                alert(errorMsg);
             });
     };
 
@@ -79,10 +104,23 @@ function AddProgramForm({ onProgramAdded }) {
                     <label>Nome do Programa:</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                 </div>
+                
                 <div className="form-group">
-                    <label>Dias da Semana (ex: Segunda a Sexta):</label>
-                    <input type="text" name="daysOfWeek" value={formData.daysOfWeek} onChange={handleChange} required />
+                    <label>Dias da Semana:</label>
+                    <div className="checkbox-group-days">
+                        {daysOfWeekOptions.map(day => (
+                            <label key={day.id} className="day-label">
+                                <span className="day-text">{day.label}</span>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedDays.includes(day.id)}
+                                    onChange={() => handleDayChange(day.id)}
+                                />
+                            </label>
+                        ))}
+                    </div>
                 </div>
+
                 <div className="form-group">
                     <label>Horário de Início:</label>
                     <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required />
@@ -98,7 +136,7 @@ function AddProgramForm({ onProgramAdded }) {
                         value={formData.imageUrls.join('\n')}
                         onChange={handleImageUrlsChange}
                         rows="4"
-                        placeholder="https://exemplo.com/imagem1.jpg&#10;https://exemplo.com/imagem2.jpg"
+                        placeholder="https://exemplo.com/imagem1.jpg\nhttps://exemplo.com/imagem2.jpg"
                     />
                 </div>
                 <div className="form-group">

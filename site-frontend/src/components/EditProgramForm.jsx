@@ -3,24 +3,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Padrão de Segunda a Domingo
+const daysOfWeekOptions = [
+    { id: 'Segunda', label: 'Seg' },
+    { id: 'Terça',   label: 'Ter' },
+    { id: 'Quarta',  label: 'Qua' },
+    { id: 'Quinta',  label: 'Qui' },
+    { id: 'Sexta',   label: 'Sex' },
+    { id: 'Sábado',  label: 'Sab' },
+    { id: 'Domingo', label: 'Dom' }
+];
+
 function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
-    // CORREÇÃO: Usamos apenas um estado para todos os dados do formulário
-    const [formData, setFormData] = useState({
-        ...programToEdit,
-        startTime: programToEdit.startTime.substring(0, 5),
-        endTime: programToEdit.endTime.substring(0, 5),
-    });
-    
+    const [formData, setFormData] = useState({ ...programToEdit });
+    const [selectedDays, setSelectedDays] = useState([]);
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/locutores')
-            .then(response => {
-                setAllLocutores(response.data.content);
-            })
-            .catch(error => {
-                console.error("Erro ao buscar locutores!", error);
-            });
+        // A CORREÇÃO ESTÁ AQUI: Adicionado '&sort=name,asc' para ordenar por nome
+        axios.get('/api/locutores?size=200&sort=name,asc')
+            .then(response => setAllLocutores(response.data.content))
+            .catch(error => console.error("Erro ao buscar locutores!", error));
     }, []);
 
     useEffect(() => {
@@ -29,14 +32,22 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
             startTime: programToEdit.startTime.substring(0, 5),
             endTime: programToEdit.endTime.substring(0, 5),
         });
+        setSelectedDays(programToEdit.daysOfWeek ? programToEdit.daysOfWeek.split(',') : []);
     }, [programToEdit]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+    
+    const handleDayChange = (dayId) => {
+        setSelectedDays(prevDays =>
+            prevDays.includes(dayId)
+                ? prevDays.filter(d => d !== dayId)
+                : [...prevDays, dayId]
+        );
+    };
 
-    // CORREÇÃO: Lógica para o campo de texto das imagens
     const handleImageUrlsChange = (e) => {
         const urls = e.target.value.split('\n');
         setFormData(prev => ({ ...prev, imageUrls: urls }));
@@ -59,13 +70,17 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Filtra URLs vazias antes de enviar
+        
+        if (selectedDays.length === 0) {
+            alert('Por favor, selecione pelo menos um dia da semana.');
+            return;
+        }
+
         const dataToSend = {
             ...formData,
+            daysOfWeek: selectedDays.join(','),
             imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
         };
-        console.log("Dados a serem enviados:", dataToSend); 
-
         onUpdate(dataToSend.id, dataToSend);
     };
 
@@ -81,10 +96,23 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
                     <label>Nome do Programa:</label>
                     <input type="text" name="name" value={formData.name} onChange={handleChange} required />
                 </div>
+                
                 <div className="form-group">
                     <label>Dias da Semana:</label>
-                    <input type="text" name="daysOfWeek" value={formData.daysOfWeek} onChange={handleChange} required />
+                    <div className="checkbox-group-days">
+                        {daysOfWeekOptions.map(day => (
+                            <label key={day.id} className="day-label">
+                                <span className="day-text">{day.label}</span>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedDays.includes(day.id)}
+                                    onChange={() => handleDayChange(day.id)}
+                                />
+                            </label>
+                        ))}
+                    </div>
                 </div>
+
                 <div className="form-group">
                     <label>Horário de Início:</label>
                     <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required />
