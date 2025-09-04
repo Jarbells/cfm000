@@ -11,6 +11,28 @@ const OffAirDisplay = () => (
     </div>
 );
 
+// Componente para a nova lógica de exibição
+const ProgramInfo = ({ program }) => {
+    // Cenário 1: Se o programa tem locutores, exibe os nomes.
+    if (program.announcers && program.announcers.length > 0) {
+        return (
+            <p className="text-xl text-gray-300">
+                com {program.announcers.map(a => a.name).join(' & ')}
+            </p>
+        );
+    }
+    // Cenário 2: Se não tem locutores mas tem info adicional, exibe a info.
+    if (program.additionalInfo) {
+        return (
+            <p className="text-xl text-gray-300">
+                {program.additionalInfo}
+            </p>
+        );
+    }
+    // Cenário 3: Se não tem nenhum dos dois, não renderiza nada.
+    return null;
+};
+
 function OnAirSection() {
     const [currentProgram, setCurrentProgram] = useState(null);
     const [backgroundImage, setBackgroundImage] = useState('https://placehold.co/1920x1080/121212/FFA500?text=Cultura+FM');
@@ -21,6 +43,7 @@ function OnAirSection() {
         const now = new Date();
         const dayMap = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
         const currentDay = dayMap[now.getDay()];
+        // CORREÇÃO DE ROBUSTEZ: Garante que a hora atual tenha sempre 2 dígitos (ex: 09:05)
         const currentTime = now.toTimeString().substring(0, 5);
 
         const activeProgram = programs.find(program => {
@@ -35,9 +58,8 @@ function OnAirSection() {
     };
 
     useEffect(() => {
-        axios.get('/api/programas?size=100') // Busca todos os programas
+        axios.get('/api/programas?size=100')
             .then(response => {
-                // A CORREÇÃO ESTÁ AQUI: Extraímos a lista de dentro da propriedade 'content'
                 const allPrograms = response.data.content;
                 findCurrentProgram(allPrograms);
 
@@ -48,14 +70,14 @@ function OnAirSection() {
     }, []);
 
     useEffect(() => {
-        if (currentProgram && currentProgram.imageUrls && currentProgram.imageUrls.length > 0) {
+        if (currentProgram && Array.isArray(currentProgram.imageUrls) && currentProgram.imageUrls.length > 0) {
             setBackgroundImage(currentProgram.imageUrls[imageIndex]);
             const imageIntervalId = setInterval(() => {
                 setImageIndex(prevIndex => (prevIndex + 1) % currentProgram.imageUrls.length);
-            }, 300000);
+            }, 30000); // Reduzi o tempo de troca de imagem para 30s para dinamismo
             return () => clearInterval(imageIntervalId);
         } else {
-            setBackgroundImage('https://placehold.co/1920x1080/121212/FFA500?text=Cultura+FM');
+            setBackgroundImage('https://images.unsplash.com/photo-1598387993441-a364f55142b4?q=80&w=1920&auto=format&fit=crop');
         }
     }, [currentProgram, imageIndex]);
 
@@ -90,9 +112,9 @@ function OnAirSection() {
                 <div className="relative z-20 p-4">
                     <h2 className="text-lg font-semibold uppercase tracking-widest text-[#FFA500]">No Ar Agora</h2>
                     <h1 className="text-5xl md:text-6xl font-black my-2">{currentProgram.name}</h1>
-                    <p className="text-xl text-gray-300">
-                        com {currentProgram.announcers.map(a => a.name).join(' & ')}
-                    </p>
+                    
+                    {/* AQUI ESTÁ A LÓGICA ATUALIZADA */}
+                    <ProgramInfo program={currentProgram} />
                     
                     <div className="w-full max-w-md mx-auto mt-6">
                         <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
@@ -111,8 +133,10 @@ function OnAirSection() {
     );
 }
 
+// Sua função corrigida para os dias da semana
 function parseDaysOfWeek(days) {
-    const dayMap = {
+    if (!days) return []; // Adiciona uma verificação para segurança
+    const phraseMap = {
         'segunda a sexta': ['seg', 'ter', 'qua', 'qui', 'sex'],
         'segunda a sábado': ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'],
         'segunda a quinta': ['seg', 'ter', 'qua', 'qui'],
@@ -120,8 +144,18 @@ function parseDaysOfWeek(days) {
         'sábado': ['sab'],
         'domingo': ['dom'],
     };
+    const dayAbbreviationMap = {
+        'Segunda': 'seg', 'Terça': 'ter', 'Quarta': 'qua', 'Quinta': 'qui',
+        'Sexta': 'sex', 'Sábado': 'sab', 'Domingo': 'dom'
+    };
     const lowerDays = days.toLowerCase();
-    return dayMap[lowerDays] || [];
+    if (phraseMap[lowerDays]) {
+        return phraseMap[lowerDays];
+    }
+    const individualDays = days.split(',');
+    return individualDays
+        .map(day => dayAbbreviationMap[day.trim()])
+        .filter(Boolean);
 }
 
 export default OnAirSection;

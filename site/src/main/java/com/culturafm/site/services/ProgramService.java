@@ -96,8 +96,9 @@ public class ProgramService {
 		entity.setDaysOfWeek(dto.getDaysOfWeek());
 		entity.setStartTime(dto.getStartTime());
 		entity.setEndTime(dto.getEndTime());
+		entity.setAdditionalInfo(dto.getAdditionalInfo());
 		
-		// A CORREÇÃO ESTÁ AQUI: Em vez de modificar a lista existente, criamos e substituímos por uma nova.
+		// A CORREÇÃO ESTÁ AQUI: Em vez de modificar a lista existente, criei e substitui por uma nova.
 		// Isto é mais robusto e evita problemas de estado da sessão do Hibernate.
 		Set<ProgramImage> newImages = new HashSet<>();
 		for (String imgUrl : dto.getImageUrls()) {

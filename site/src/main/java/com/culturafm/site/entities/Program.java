@@ -35,6 +35,10 @@ public class Program {
 
 	@Column(name = "end_time")
 	private LocalTime endTime;
+	
+	// NOVO CAMPO ADICIONADO
+	@Column(name = "additional_info")
+	private String additionalInfo;
 
 	@OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ProgramImage> images = new HashSet<>();
@@ -44,6 +48,7 @@ public class Program {
 			   joinColumns = @JoinColumn(name = "program_id"),
 			   inverseJoinColumns = @JoinColumn(name = "locutor_id"))
 	private Set<Locutor> announcers = new HashSet<>();
+	
 
 	// Construtor padrão (obrigatório pelo JPA)
 	public Program() {
@@ -98,6 +103,14 @@ public class Program {
 
 	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
+	}
+	
+	public String getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setAdditionalInfo(String additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	public Set<ProgramImage> getImages() {

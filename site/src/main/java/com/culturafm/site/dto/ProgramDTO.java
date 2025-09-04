@@ -19,6 +19,9 @@ public class ProgramDTO {
     private LocalTime endTime;
     private List<String> imageUrls = new ArrayList<>();
     
+    // NOVO CAMPO ADICIONADO
+    private String additionalInfo;
+    
     // NOVO CAMPO: Lista de LocutorDTO
     private List<LocutorDTO> announcers = new ArrayList<>();
 
@@ -87,6 +90,15 @@ public class ProgramDTO {
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
+    }
+    
+    // GETTER E SETTER PARA O NOVO CAMPO
+    public String getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(String additionalInfo) {
+        this.additionalInfo = additionalInfo;
     }
 
     // Getter e Setter para o novo campo de locutores

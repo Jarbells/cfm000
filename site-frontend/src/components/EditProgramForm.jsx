@@ -20,7 +20,6 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        // A CORREÇÃO ESTÁ AQUI: Adicionado '&sort=name,asc' para ordenar por nome
         axios.get('/api/locutores?size=200&sort=name,asc')
             .then(response => setAllLocutores(response.data.content))
             .catch(error => console.error("Erro ao buscar locutores!", error));
@@ -29,8 +28,8 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
     useEffect(() => {
         setFormData({
             ...programToEdit,
-            startTime: programToEdit.startTime.substring(0, 5),
-            endTime: programToEdit.endTime.substring(0, 5),
+            startTime: programToEdit.startTime ? programToEdit.startTime.substring(0, 5) : '',
+            endTime: programToEdit.endTime ? programToEdit.endTime.substring(0, 5) : '',
         });
         setSelectedDays(programToEdit.daysOfWeek ? programToEdit.daysOfWeek.split(',') : []);
     }, [programToEdit]);
@@ -79,13 +78,13 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
         const dataToSend = {
             ...formData,
             daysOfWeek: selectedDays.join(','),
-            imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
+            imageUrls: Array.isArray(formData.imageUrls) ? formData.imageUrls.filter(url => url && url.trim() !== '') : []
         };
         onUpdate(dataToSend.id, dataToSend);
     };
 
     const isLocutorChecked = (locutorId) => {
-        return formData.announcers.some(announcer => announcer.id === locutorId);
+        return formData.announcers && formData.announcers.some(announcer => announcer.id === locutorId);
     };
 
     return (
@@ -94,7 +93,7 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Nome do Programa:</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+                    <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required />
                 </div>
                 
                 <div className="form-group">
@@ -115,17 +114,28 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
 
                 <div className="form-group">
                     <label>Horário de Início:</label>
-                    <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} required />
+                    <input type="time" name="startTime" value={formData.startTime || ''} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
                     <label>Horário de Fim:</label>
-                    <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required />
+                    <input type="time" name="endTime" value={formData.endTime || ''} onChange={handleChange} required />
                 </div>
+
+                <div className="form-group">
+                    <label>Informações Adicionais (Opcional):</label>
+                    <input 
+                        type="text" 
+                        name="additionalInfo" 
+                        value={formData.additionalInfo || ''} 
+                        onChange={handleChange} 
+                    />
+                </div>
+
                 <div className="form-group">
                     <label>URLs das Imagens de Fundo (uma por linha):</label>
                     <textarea 
                         name="imageUrls"
-                        value={formData.imageUrls.join('\n')}
+                        value={Array.isArray(formData.imageUrls) ? formData.imageUrls.join('\n') : ''}
                         onChange={handleImageUrlsChange}
                         rows="4"
                     />

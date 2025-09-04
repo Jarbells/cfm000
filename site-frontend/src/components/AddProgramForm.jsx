@@ -20,13 +20,13 @@ function AddProgramForm({ onProgramAdded }) {
         startTime: '',
         endTime: '',
         imageUrls: [],
-        announcers: []
+        announcers: [],
+        additionalInfo: '' 
     });
     const [selectedDays, setSelectedDays] = useState([]);
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        // A CORREÇÃO ESTÁ AQUI: Adicionado '&sort=name,asc' para ordenar por nome
         axios.get('/api/locutores?size=200&sort=name,asc') 
             .then(response => {
                 setAllLocutores(response.data.content);
@@ -78,7 +78,7 @@ function AddProgramForm({ onProgramAdded }) {
 
         const dataToSend = {
             ...formData,
-            daysOfWeek: selectedDays.join(','), // Transforma o array em string: "Segunda,Sexta"
+            daysOfWeek: selectedDays.join(','),
             imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
         };
 
@@ -86,7 +86,7 @@ function AddProgramForm({ onProgramAdded }) {
             .then(() => {
                 alert('Programa cadastrado com sucesso!');
                 onProgramAdded();
-                setFormData({ name: '', startTime: '', endTime: '', imageUrls: [], announcers: [] });
+                setFormData({ name: '', startTime: '', endTime: '', imageUrls: [], announcers: [], additionalInfo: '' });
                 setSelectedDays([]);
             })
             .catch(error => {
@@ -129,6 +129,18 @@ function AddProgramForm({ onProgramAdded }) {
                     <label>Horário de Fim:</label>
                     <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} required />
                 </div>
+                
+                <div className="form-group">
+                    <label>Informações Adicionais (Opcional):</label>
+                    <input 
+                        type="text" 
+                        name="additionalInfo" 
+                        value={formData.additionalInfo} 
+                        onChange={handleChange} 
+                        placeholder="Ex: Da Catedral Jesus, Maria e José"
+                    />
+                </div>
+
                 <div className="form-group">
                     <label>URLs das Imagens de Fundo (uma por linha):</label>
                     <textarea 
@@ -136,7 +148,8 @@ function AddProgramForm({ onProgramAdded }) {
                         value={formData.imageUrls.join('\n')}
                         onChange={handleImageUrlsChange}
                         rows="4"
-                        placeholder="https://exemplo.com/imagem1.jpg\nhttps://exemplo.com/imagem2.jpg"
+                        placeholder={`https://exemplo.com/imagem1.jpg
+https://exemplo.com/imagem2.jpg`}
                     />
                 </div>
                 <div className="form-group">
