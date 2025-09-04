@@ -1,5 +1,3 @@
-// src/components/EditProgramForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -20,8 +18,15 @@ function EditProgramForm({ programToEdit, onUpdate, onCancel }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/locutores?size=200&sort=name,asc')
-            .then(response => setAllLocutores(response.data.content))
+        // CORREÇÃO: A ordenação foi removida da chamada da API
+        axios.get('/api/locutores?size=200')
+            .then(response => {
+                // A ordenação alfabética que respeita acentos é feita aqui no frontend
+                const sortedLocutores = response.data.content.sort((a, b) => 
+                    a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
+                );
+                setAllLocutores(sortedLocutores);
+            })
             .catch(error => console.error("Erro ao buscar locutores!", error));
     }, []);
 

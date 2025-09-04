@@ -1,5 +1,3 @@
-// src/main/java/com/culturafm/site/services/ProgramService.java
-
 package com.culturafm.site.services;
 
 import java.time.LocalTime;
@@ -98,33 +96,42 @@ public class ProgramService {
 		entity.setEndTime(dto.getEndTime());
 		entity.setAdditionalInfo(dto.getAdditionalInfo());
 		
-		// A CORREÇÃO ESTÁ AQUI: Em vez de modificar a lista existente, criei e substitui por uma nova.
-		// Isto é mais robusto e evita problemas de estado da sessão do Hibernate.
+		// Lógica para imagens (continua a mesma)
 		Set<ProgramImage> newImages = new HashSet<>();
-		for (String imgUrl : dto.getImageUrls()) {
-			ProgramImage img = new ProgramImage();
-			img.setImageUrl(imgUrl);
-			img.setProgram(entity);
-			newImages.add(img);
+		if (dto.getImageUrls() != null) {
+			for (String imgUrl : dto.getImageUrls()) {
+				ProgramImage img = new ProgramImage();
+				img.setImageUrl(imgUrl);
+				img.setProgram(entity);
+				newImages.add(img);
+			}
 		}
 		entity.getImages().clear();
 		entity.getImages().addAll(newImages);
 
-
+		// --- CORREÇÃO E ATUALIZAÇÃO DA LÓGICA PARA LOCUTORES ---
+		// Limpa a lista de locutores existente
 		entity.getAnnouncers().clear();
-		for (LocutorDTO locutorDto : dto.getAnnouncers()) {
-			Locutor locutor = locutorRepository.findById(locutorDto.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("Locutor não encontrado com o ID: " + locutorDto.getId()));
-			entity.getAnnouncers().add(locutor);
+		// Adiciona os novos locutores na ordem exata em que vieram do formulário
+		if (dto.getAnnouncers() != null) {
+			for (LocutorDTO locutorDto : dto.getAnnouncers()) {
+				Locutor locutor = locutorRepository.findById(locutorDto.getId())
+						.orElseThrow(() -> new ResourceNotFoundException("Locutor não encontrado com o ID: " + locutorDto.getId()));
+				entity.getAnnouncers().add(locutor);
+			}
 		}
 	}
 	
-	// ... (o resto da classe continua igual) ...
 	private void validateConflict(ProgramDTO dto, Long programIdToIgnore) {
 		LocalTime newStartTime = dto.getStartTime();
 		LocalTime newEndTime = dto.getEndTime();
-		Set<String> newDays = parseDaysOfWeek(dto.getDaysOfWeek());
 		
+		// Adiciona uma verificação para garantir que daysOfWeek não seja nulo
+		if (dto.getDaysOfWeek() == null || newStartTime == null || newEndTime == null) {
+			return; // Não pode validar se os dados essenciais estão faltando
+		}
+
+		Set<String> newDays = parseDaysOfWeek(dto.getDaysOfWeek());
 		List<Program> existingPrograms = programRepository.findAll();
 		
 		for (Program existing : existingPrograms) {
@@ -149,26 +156,26 @@ public class ProgramService {
 	}
 	
 	private Set<String> parseDaysOfWeek(String days) {
-		days = days.toLowerCase();
+        if (days == null || days.trim().isEmpty()) {
+            return new HashSet<>();
+        }
+		String lowerDays = days.toLowerCase();
 		Set<String> parsedDays = new HashSet<>();
 		
-		if (days.contains("segunda a sexta")) {
-			parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui", "sex"));
-		} else if (days.contains("segunda a sábado")) {
-			parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui", "sex", "sab"));
-		} else if (days.contains("segunda a quinta")) {
-			parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui"));
-		}
+		// Lógica para frases
+		if (lowerDays.contains("segunda a sexta")) parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui", "sex"));
+		else if (lowerDays.contains("segunda a sábado")) parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui", "sex", "sab"));
+		else if (lowerDays.contains("segunda a quinta")) parsedDays.addAll(Arrays.asList("seg", "ter", "qua", "qui"));
 
-		if (days.contains("sexta-feira")) {
-			parsedDays.add("sex");
-		}
-		if (days.contains("sábado")) {
-			parsedDays.add("sab");
-		}
-		if (days.contains("domingo")) {
-			parsedDays.add("dom");
-		}
+		// Lógica para dias individuais (que podem estar em frases ou sozinhos)
+		if (lowerDays.contains("segunda")) parsedDays.add("seg");
+		if (lowerDays.contains("terça")) parsedDays.add("ter");
+		if (lowerDays.contains("quarta")) parsedDays.add("qua");
+		if (lowerDays.contains("quinta")) parsedDays.add("qui");
+		if (lowerDays.contains("sexta")) parsedDays.add("sex");
+		if (lowerDays.contains("sábado")) parsedDays.add("sab");
+		if (lowerDays.contains("domingo")) parsedDays.add("dom");
+		
 		return parsedDays;
 	}
 }

@@ -1,10 +1,8 @@
-// src/main/java/com/culturafm/site/entities/Locutor.java
-
 package com.culturafm.site.entities;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,15 +24,17 @@ public class Locutor {
 
     private String name;
 
-    @Column(columnDefinition = "TEXT") // Ideal para textos longos
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
     @Column(name = "photo_url", length = 1024)
     private String photoUrl;
 
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Trocamos 'Set' por 'List' para manter a consistência com a entidade Program.
     @JsonIgnore
     @ManyToMany(mappedBy = "announcers")
-    private Set<Program> programs = new HashSet<>();
+    private List<Program> programs = new ArrayList<>();
 
     public Locutor() {
     }
@@ -79,8 +79,14 @@ public class Locutor {
         this.photoUrl = photoUrl;
     }
 
-    public Set<Program> getPrograms() {
+    // Getter atualizado para usar 'List'
+    public List<Program> getPrograms() {
         return programs;
+    }
+    
+    // Setter adicionado para consistência
+    public void setPrograms(List<Program> programs) {
+        this.programs = programs;
     }
 
     @Override

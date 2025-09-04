@@ -1,5 +1,3 @@
-// src/components/OnAirSection.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -11,26 +9,38 @@ const OffAirDisplay = () => (
     </div>
 );
 
-// Componente para a nova lógica de exibição
+// --- CORREÇÃO APLICADA AQUI ---
+// Componente com a lógica de formatação de nomes de locutores
 const ProgramInfo = ({ program }) => {
-    // Cenário 1: Se o programa tem locutores, exibe os nomes.
-    if (program.announcers && program.announcers.length > 0) {
-        return (
-            <p className="text-xl text-gray-300">
-                com {program.announcers.map(a => a.name).join(' & ')}
-            </p>
-        );
+    // Se não tiver locutores, verifica a info adicional
+    if (!program.announcers || program.announcers.length === 0) {
+        if (program.additionalInfo) {
+            return <p className="text-xl text-gray-300">{program.additionalInfo}</p>;
+        }
+        return null; // Não exibe nada se não tiver nem locutor nem info
     }
-    // Cenário 2: Se não tem locutores mas tem info adicional, exibe a info.
-    if (program.additionalInfo) {
-        return (
-            <p className="text-xl text-gray-300">
-                {program.additionalInfo}
-            </p>
-        );
+
+    // Lógica de formatação dos nomes
+    const announcerNames = program.announcers.map(a => a.name);
+    let formattedNames;
+
+    if (announcerNames.length === 1) {
+        // Apenas o nome para 1 locutor
+        formattedNames = announcerNames[0];
+    } else if (announcerNames.length === 2) {
+        // "Nome1 & Nome2" para 2 locutores
+        formattedNames = announcerNames.join(' & ');
+    } else {
+        // "Nome1, Nome2 & Nome3" para 3 ou mais locutores
+        const last = announcerNames.pop();
+        formattedNames = `${announcerNames.join(', ')} & ${last}`;
     }
-    // Cenário 3: Se não tem nenhum dos dois, não renderiza nada.
-    return null;
+
+    return (
+        <p className="text-xl text-gray-300">
+            com {formattedNames}
+        </p>
+    );
 };
 
 function OnAirSection() {
@@ -43,7 +53,6 @@ function OnAirSection() {
         const now = new Date();
         const dayMap = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
         const currentDay = dayMap[now.getDay()];
-        // CORREÇÃO DE ROBUSTEZ: Garante que a hora atual tenha sempre 2 dígitos (ex: 09:05)
         const currentTime = now.toTimeString().substring(0, 5);
 
         const activeProgram = programs.find(program => {
@@ -74,7 +83,7 @@ function OnAirSection() {
             setBackgroundImage(currentProgram.imageUrls[imageIndex]);
             const imageIntervalId = setInterval(() => {
                 setImageIndex(prevIndex => (prevIndex + 1) % currentProgram.imageUrls.length);
-            }, 30000); // Reduzi o tempo de troca de imagem para 30s para dinamismo
+            }, 30000);
             return () => clearInterval(imageIntervalId);
         } else {
             setBackgroundImage('https://images.unsplash.com/photo-1598387993441-a364f55142b4?q=80&w=1920&auto=format&fit=crop');
@@ -113,7 +122,6 @@ function OnAirSection() {
                     <h2 className="text-lg font-semibold uppercase tracking-widest text-[#FFA500]">No Ar Agora</h2>
                     <h1 className="text-5xl md:text-6xl font-black my-2">{currentProgram.name}</h1>
                     
-                    {/* AQUI ESTÁ A LÓGICA ATUALIZADA */}
                     <ProgramInfo program={currentProgram} />
                     
                     <div className="w-full max-w-md mx-auto mt-6">
@@ -135,7 +143,7 @@ function OnAirSection() {
 
 // Sua função corrigida para os dias da semana
 function parseDaysOfWeek(days) {
-    if (!days) return []; // Adiciona uma verificação para segurança
+    if (!days) return []; 
     const phraseMap = {
         'segunda a sexta': ['seg', 'ter', 'qua', 'qui', 'sex'],
         'segunda a sábado': ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'],

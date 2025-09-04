@@ -1,7 +1,9 @@
 package com.culturafm.site.entities;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
 @Entity
@@ -35,33 +38,34 @@ public class Program {
 
 	@Column(name = "end_time")
 	private LocalTime endTime;
-	
-	// NOVO CAMPO ADICIONADO
+
 	@Column(name = "additional_info")
 	private String additionalInfo;
 
 	@OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ProgramImage> images = new HashSet<>();
 
+	// --- CORREÇÃO PRINCIPAL APLICADA AQUI ---
+	// Trocamos 'Set' por 'List' para manter a ordem de inserção.
+	// Adicionamos '@OrderColumn' para que o JPA crie uma coluna
+	// que armazena a posição de cada locutor na lista.
 	@ManyToMany
 	@JoinTable(name = "tb_program_locutor",
 			   joinColumns = @JoinColumn(name = "program_id"),
 			   inverseJoinColumns = @JoinColumn(name = "locutor_id"))
-	private Set<Locutor> announcers = new HashSet<>();
-	
+	@OrderColumn(name = "announcer_order")
+	private List<Locutor> announcers = new ArrayList<>();
 
-	// Construtor padrão (obrigatório pelo JPA)
 	public Program() {
 	}
 
-	// CORREÇÃO: Construtor com todos os campos atualizado. Removi o antigo parâmetro "presenter".
-	// Não incluí coleções (Set) no construtor com argumentos, pois elas são gerenciadas de outra forma.
-	public Program(Long id, String name, String daysOfWeek, LocalTime startTime, LocalTime endTime) {
+	public Program(Long id, String name, String daysOfWeek, LocalTime startTime, LocalTime endTime, String additionalInfo) {
 		this.id = id;
 		this.name = name;
 		this.daysOfWeek = daysOfWeek;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.additionalInfo = additionalInfo;
 	}
 
 	// Getters e Setters
@@ -104,7 +108,7 @@ public class Program {
 	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
-	
+
 	public String getAdditionalInfo() {
 		return additionalInfo;
 	}
@@ -121,16 +125,14 @@ public class Program {
 		this.images = images;
 	}
 
-	// CORREÇÃO: Faltava o getter para a nova coleção de locutores.
-	public Set<Locutor> getAnnouncers() {
+	// Getter e Setter atualizados para usar 'List'
+	public List<Locutor> getAnnouncers() {
 		return announcers;
 	}
 
-	// CORREÇÃO: Adicionei o setter também, para consistência.
-	public void setAnnouncers(Set<Locutor> announcers) {
+	public void setAnnouncers(List<Locutor> announcers) {
 		this.announcers = announcers;
 	}
-
 
 	@Override
 	public int hashCode() {

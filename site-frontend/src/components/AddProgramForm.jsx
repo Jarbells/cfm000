@@ -1,5 +1,3 @@
-// src/components/AddProgramForm.jsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -27,9 +25,14 @@ function AddProgramForm({ onProgramAdded }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/locutores?size=200&sort=name,asc') 
+        // CORREÇÃO: A ordenação foi removida da chamada da API
+        axios.get('/api/locutores?size=200') 
             .then(response => {
-                setAllLocutores(response.data.content);
+                // A ordenação alfabética que respeita acentos é feita aqui no frontend
+                const sortedLocutores = response.data.content.sort((a, b) => 
+                    a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
+                );
+                setAllLocutores(sortedLocutores);
             })
             .catch(error => {
                 console.error("Erro ao buscar locutores para o formulário!", error);
@@ -148,8 +151,7 @@ function AddProgramForm({ onProgramAdded }) {
                         value={formData.imageUrls.join('\n')}
                         onChange={handleImageUrlsChange}
                         rows="4"
-                        placeholder={`https://exemplo.com/imagem1.jpg
-https://exemplo.com/imagem2.jpg`}
+                        placeholder={`https://exemplo.com/imagem1.jpg\nhttps://exemplo.com/imagem2.jpg`}
                     />
                 </div>
                 <div className="form-group">
