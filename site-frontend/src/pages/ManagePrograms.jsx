@@ -11,10 +11,8 @@ function ManagePrograms() {
     const [editingProgram, setEditingProgram] = useState(null);
 
     const fetchPrograms = () => {
-        // Adicionamos o parâmetro size=200 para garantir que todos os programas são listados no painel
         axios.get('/api/programas?size=200&sort=startTime,asc')
             .then(response => {
-                // A CORREÇÃO ESTÁ AQUI: Extraímos a lista de dentro da propriedade 'content'
                 setPrograms(response.data.content);
             })
             .catch(error => {

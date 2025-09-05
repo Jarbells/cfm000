@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Facebook, Instagram, Youtube, Twitter } from 'react-feather'; // Importa os ícones
+import { Facebook, Instagram, Youtube, Twitter } from 'react-feather';
+import { formatDisplayPhoneNumber } from '../utils/formatters.js'; // 1. Importe a função
 
 function ContactPage() {
     const [info, setInfo] = useState(null);
@@ -34,16 +35,16 @@ function ContactPage() {
         <main className="container mx-auto px-4 py-12">
             <h1 className="text-4xl font-black text-white mb-8 border-l-4 border-[#FFA500] pl-4">Fale Conosco</h1>
             
-            {/* O layout agora é uma única coluna, mais focado */}
             <div className="bg-[#181818] p-8 rounded-lg max-w-3xl mx-auto">
                 <div className="space-y-8">
                     <div>
                         <h2 className="text-2xl font-bold text-[#FFA500] mb-3">Nossos Contatos</h2>
-                        <p className="text-lg text-gray-300"><strong>Telefone:</strong> {info.phonePrimary || 'Não informado'}</p>
+                        {/* 2. Use a função de formatação */}
+                        <p className="text-lg text-gray-300"><strong>Telefone:</strong> {formatDisplayPhoneNumber(info.phonePrimary)}</p>
                         <p className="text-lg text-gray-300">
                         <strong>WhatsApp:</strong> 
                         {info.phoneWhatsapp ? 
-                            <a href={`https://wa.me/${info.phoneWhatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:underline"> {info.phoneWhatsapp}</a>
+                            <a href={`https://wa.me/${info.phoneWhatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="hover:underline"> {formatDisplayPhoneNumber(info.phoneWhatsapp)}</a>
                             : ' Não informado'
                         }
                         </p>
@@ -62,26 +63,7 @@ function ContactPage() {
                     <div>
                         <h2 className="text-2xl font-bold text-[#FFA500] mb-3">Redes Sociais</h2>
                         <div className="flex space-x-4">
-                            {info.socialFacebookUrl && (
-                                <a href={info.socialFacebookUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FFA500] transition duration-300">
-                                    <Facebook size={24} />
-                                </a>
-                            )}
-                            {info.socialInstagramUrl && (
-                                <a href={info.socialInstagramUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FFA500] transition duration-300">
-                                    <Instagram size={24} />
-                                </a>
-                            )}
-                            {info.socialYoutubeUrl && (
-                                <a href={info.socialYoutubeUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FFA500] transition duration-300">
-                                    <Youtube size={24} />
-                                </a>
-                            )}
-                            {info.socialXUrl && (
-                                <a href={info.socialXUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FFA500] transition duration-300">
-                                    <Twitter size={24} />
-                                </a>
-                            )}
+                           {/* ...icones... */}
                         </div>
                     </div>
                 </div>

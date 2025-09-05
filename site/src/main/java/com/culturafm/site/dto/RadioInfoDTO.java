@@ -1,7 +1,8 @@
 package com.culturafm.site.dto;
 
-import com.culturafm.site.entities.RadioInfo;
 import org.springframework.beans.BeanUtils;
+
+import com.culturafm.site.entities.RadioInfo;
 
 public class RadioInfoDTO {
 
@@ -22,6 +23,9 @@ public class RadioInfoDTO {
 	private String radioName;
 	private String slogan;
 	private String logoUrl;
+	private String offAirTitle;
+	private String offAirSubtitle;
+	private String offAirImageUrl;
 
 	public RadioInfoDTO() {
 	}
@@ -167,4 +171,27 @@ public class RadioInfoDTO {
 		this.logoUrl = logoUrl;
 	}
 
+	public String getOffAirTitle() {
+		return offAirTitle;
+	}
+
+	public void setOffAirTitle(String offAirTitle) {
+		this.offAirTitle = offAirTitle;
+	}
+
+	public String getOffAirSubtitle() {
+		return offAirSubtitle;
+	}
+
+	public void setOffAirSubtitle(String offAirSubtitle) {
+		this.offAirSubtitle = offAirSubtitle;
+	}
+
+	public String getOffAirImageUrl() {
+		return offAirImageUrl;
+	}
+
+	public void setOffAirImageUrl(String offAirImageUrl) {
+		this.offAirImageUrl = offAirImageUrl;
+	}
 }

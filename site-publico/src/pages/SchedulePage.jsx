@@ -48,7 +48,7 @@ function SchedulePage() {
                 }
             });
         });
-        
+
         setProgramsByDay(grouped);
     };
 
@@ -61,18 +61,17 @@ function SchedulePage() {
     return (
         <main className="container mx-auto px-4 py-12">
             <h1 className="text-4xl font-black text-white mb-8 border-l-4 border-[#FFA500] pl-4">Nossa Programação</h1>
-            
+
             {/* Seletor de dias da semana */}
             <div className="flex flex-wrap justify-center gap-2 mb-10">
                 {weekDays.map(day => (
                     <button
                         key={day}
                         onClick={() => setSelectedDay(day)}
-                        className={`py-2 px-5 font-bold rounded-full transition duration-300 transform hover:scale-105 ${
-                            selectedDay === day 
-                            ? 'bg-[#FFA500] text-black' 
-                            : 'bg-[#282828] text-gray-300 hover:bg-[#383838]'
-                        }`}
+                        className={`py-2 px-5 font-bold rounded-full transition duration-300 transform hover:scale-105 ${selectedDay === day
+                                ? 'bg-[#FFA500] text-black'
+                                : 'bg-[#282828] text-gray-300 hover:bg-[#383838]'
+                            }`}
                     >
                         {day}
                     </button>
@@ -89,11 +88,23 @@ function SchedulePage() {
                                 <div className="w-32 text-lg font-bold text-white">
                                     {formatTime(program.startTime)} - {formatTime(program.endTime)}
                                 </div>
+
                                 <div className="flex-grow">
                                     <h3 className="font-bold text-lg text-white">{program.name}</h3>
-                                    <p className="text-gray-400 text-sm italic">
-                                        {program.announcers.map(a => a.name).join(' & ')}
-                                    </p>
+
+                                    {/* Verifica se há locutores para exibir */}
+                                    {program.announcers && program.announcers.length > 0 && (
+                                        <p className="text-gray-400 text-sm italic">
+                                            {program.announcers.map(a => a.name).join(' & ')}
+                                        </p>
+                                    )}
+
+                                    {/* AQUI ESTÁ A MUDANÇA: Verifica se há informação adicional para exibir */}
+                                    {program.additionalInfo && (
+                                        <p className="text-gray-500 text-xs mt-1">
+                                            {program.additionalInfo}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         ))

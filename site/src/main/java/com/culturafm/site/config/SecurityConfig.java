@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,16 +22,12 @@ public class SecurityConfig {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // A LÓGICA CORRETA E DEFINITIVA:
-                // Permite acesso PÚBLICO (GET) aos endpoints que o site público precisa.
-                .requestMatchers(HttpMethod.GET, "/programas/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/news/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/events/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/locutores/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/sponsors/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/radio-info/**").permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/ws/**")).permitAll()
-                // EXIGE autenticação para qualquer outro pedido.
+                // REGRA 1: Permite que TODOS os pedidos GET sejam públicos.
+                // Isto é necessário para o site público funcionar.
+                .requestMatchers(HttpMethod.GET).permitAll()
+                
+                // REGRA 2: Exige autenticação para QUALQUER outro pedido (POST, PUT, DELETE, etc.)
+                // Isto protege o seu painel de administração.
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .httpBasic(withDefaults());
@@ -43,7 +38,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite os seus dois frontends de desenvolvimento
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174", "http://56.125.128.133"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

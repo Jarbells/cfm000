@@ -1,45 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRadioInfo } from '../contexts/RadioInfoContext';
 
-const OffAirDisplay = () => (
-    <div className="relative z-20 p-4">
-        <h2 className="text-lg font-semibold uppercase tracking-widest text-[#FFA500]">Cultura FM</h2>
-        <h1 className="text-5xl md:text-6xl font-black my-2">Retransmissão Via Satélite</h1>
-        <p className="text-xl text-gray-300">A melhor programação para você</p>
-    </div>
-);
+const OffAirDisplay = () => {
+    const radioInfo = useRadioInfo();
 
-// --- CORREÇÃO APLICADA AQUI ---
-// Componente com a lógica de formatação de nomes de locutores
+    return (
+        <div className="relative z-20 p-4">
+            <h2 className="text-3xl font-semibold uppercase tracking-widest text-[#FFA500]">
+                {radioInfo?.radioName || 'Cultura FM'}
+            </h2>
+            <h1 className="text-5xl md:text-6xl font-black my-2">
+                {radioInfo?.offAirTitle || 'Retransmissão Via Satélite'}
+            </h1>
+            <p className="text-xl text-gray-300">
+                {radioInfo?.offAirSubtitle || 'A melhor programação para você'}
+            </p>
+        </div>
+    );
+};
+
+// --- AQUI ESTÁ A ALTERAÇÃO ---
+// O componente foi reescrito para exibir ambos os dados quando existirem.
 const ProgramInfo = ({ program }) => {
-    // Se não tiver locutores, verifica a info adicional
-    if (!program.announcers || program.announcers.length === 0) {
-        if (program.additionalInfo) {
-            return <p className="text-xl text-gray-300">{program.additionalInfo}</p>;
+    const announcerNames = program.announcers?.map(a => a.name) || [];
+    let formattedNames = '';
+
+    if (announcerNames.length > 0) {
+        if (announcerNames.length === 1) {
+            formattedNames = announcerNames[0];
+        } else if (announcerNames.length === 2) {
+            formattedNames = announcerNames.join(' & ');
+        } else {
+            const last = announcerNames.pop();
+            formattedNames = `${announcerNames.join(', ')} & ${last}`;
         }
-        return null; // Não exibe nada se não tiver nem locutor nem info
     }
 
-    // Lógica de formatação dos nomes
-    const announcerNames = program.announcers.map(a => a.name);
-    let formattedNames;
-
-    if (announcerNames.length === 1) {
-        // Apenas o nome para 1 locutor
-        formattedNames = announcerNames[0];
-    } else if (announcerNames.length === 2) {
-        // "Nome1 & Nome2" para 2 locutores
-        formattedNames = announcerNames.join(' & ');
-    } else {
-        // "Nome1, Nome2 & Nome3" para 3 ou mais locutores
-        const last = announcerNames.pop();
-        formattedNames = `${announcerNames.join(', ')} & ${last}`;
+    // Não mostra nada se não houver locutor nem informação adicional
+    if (!formattedNames && !program.additionalInfo) {
+        return null;
     }
 
     return (
-        <p className="text-xl text-gray-300">
-            com {formattedNames}
-        </p>
+        <>
+            {/* Exibe o nome dos locutores, se houver */}
+            {formattedNames && (
+                <p className="text-xl text-gray-300">
+                    com {formattedNames}
+                </p>
+            )}
+            {/* Exibe a informação adicional, se houver */}
+            {program.additionalInfo && (
+                <p className="text-lg text-gray-400 mt-1 italic">
+                    {program.additionalInfo}
+                </p>
+            )}
+        </>
     );
 };
 
@@ -48,6 +65,7 @@ function OnAirSection() {
     const [backgroundImage, setBackgroundImage] = useState('https://placehold.co/1920x1080/121212/FFA500?text=Cultura+FM');
     const [imageIndex, setImageIndex] = useState(0);
     const [progress, setProgress] = useState(0);
+    const radioInfo = useRadioInfo();
 
     const findCurrentProgram = (programs) => {
         const now = new Date();
@@ -57,9 +75,7 @@ function OnAirSection() {
 
         const activeProgram = programs.find(program => {
             const programDays = parseDaysOfWeek(program.daysOfWeek);
-            if (!programDays.includes(currentDay)) {
-                return false;
-            }
+            if (!programDays.includes(currentDay)) return false;
             return currentTime >= program.startTime.substring(0, 5) && currentTime < program.endTime.substring(0, 5);
         });
 
@@ -71,8 +87,7 @@ function OnAirSection() {
             .then(response => {
                 const allPrograms = response.data.content;
                 findCurrentProgram(allPrograms);
-
-                const intervalId = setInterval(() => findCurrentProgram(allPrograms), 60000); 
+                const intervalId = setInterval(() => findCurrentProgram(allPrograms), 60000);
                 return () => clearInterval(intervalId);
             })
             .catch(error => console.error("Erro ao buscar a grade de programação!", error));
@@ -86,9 +101,9 @@ function OnAirSection() {
             }, 30000);
             return () => clearInterval(imageIntervalId);
         } else {
-            setBackgroundImage('https://images.unsplash.com/photo-1598387993441-a364f55142b4?q=80&w=1920&auto=format&fit=crop');
+            setBackgroundImage(radioInfo?.offAirImageUrl || 'https://images.unsplash.com/photo-1598387993441-a364f55142b4?q=80&w=1920&auto=format&fit=crop');
         }
-    }, [currentProgram, imageIndex]);
+    }, [currentProgram, imageIndex, radioInfo]);
 
     useEffect(() => {
         if (currentProgram) {
@@ -121,9 +136,7 @@ function OnAirSection() {
                 <div className="relative z-20 p-4">
                     <h2 className="text-lg font-semibold uppercase tracking-widest text-[#FFA500]">No Ar Agora</h2>
                     <h1 className="text-5xl md:text-6xl font-black my-2">{currentProgram.name}</h1>
-                    
                     <ProgramInfo program={currentProgram} />
-                    
                     <div className="w-full max-w-md mx-auto mt-6">
                         <div className="flex justify-between text-sm font-medium text-gray-400 mb-1">
                             <span>{currentProgram.startTime.substring(0, 5)}</span>
@@ -141,7 +154,6 @@ function OnAirSection() {
     );
 }
 
-// Sua função corrigida para os dias da semana
 function parseDaysOfWeek(days) {
     if (!days) return []; 
     const phraseMap = {

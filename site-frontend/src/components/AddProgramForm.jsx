@@ -1,7 +1,8 @@
+// src/components/AddProgramForm.jsx
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Padrão de Segunda a Domingo
 const daysOfWeekOptions = [
     { id: 'Segunda', label: 'Seg' },
     { id: 'Terça',   label: 'Ter' },
@@ -25,10 +26,8 @@ function AddProgramForm({ onProgramAdded }) {
     const [allLocutores, setAllLocutores] = useState([]);
 
     useEffect(() => {
-        // CORREÇÃO: A ordenação foi removida da chamada da API
         axios.get('/api/locutores?size=200') 
             .then(response => {
-                // A ordenação alfabética que respeita acentos é feita aqui no frontend
                 const sortedLocutores = response.data.content.sort((a, b) => 
                     a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
                 );
