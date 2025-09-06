@@ -65,5 +65,6 @@ public class EventService {
         entity.setLocation(dto.getLocation());
         entity.setImageUrl(dto.getImageUrl());
         entity.setEventDate(dto.getEventDate());
+        entity.setFinishDate(dto.getFinishDate());
     }
 }

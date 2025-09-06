@@ -13,6 +13,7 @@ public class EventDTO {
     private String location;
     private String imageUrl;
     private Instant eventDate;
+    private Instant finishDate;
 
     public EventDTO() {
     }
@@ -34,4 +35,6 @@ public class EventDTO {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Instant getEventDate() { return eventDate; }
     public void setEventDate(Instant eventDate) { this.eventDate = eventDate; }
+    public Instant getFinishDate() { return finishDate; }
+    public void setFinishDate(Instant finishDate) { this.finishDate = finishDate; }
 }

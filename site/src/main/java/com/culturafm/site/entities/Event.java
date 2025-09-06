@@ -25,6 +25,9 @@ public class Event {
 
     @Column(name = "event_date")
     private Instant eventDate;
+    
+    @Column(name = "finish_date")
+    private Instant finishDate; // Data final do evento (opcional)
 
     public Event() {
     }
@@ -51,7 +54,9 @@ public class Event {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     public Instant getEventDate() { return eventDate; }
     public void setEventDate(Instant eventDate) { this.eventDate = eventDate; }
-
+    public Instant getFinishDate() { return finishDate; }
+    public void setFinishDate(Instant finishDate) { this.finishDate = finishDate; }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

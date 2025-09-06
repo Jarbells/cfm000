@@ -20,10 +20,8 @@ const OffAirDisplay = () => {
     );
 };
 
-// --- AQUI ESTÁ A ALTERAÇÃO ---
-// O componente foi reescrito para exibir ambos os dados quando existirem.
 const ProgramInfo = ({ program }) => {
-    const announcerNames = program.announcers?.map(a => a.name) || [];
+    const announcerNames = [...(program.announcers?.map(a => a.name) || [])];
     let formattedNames = '';
 
     if (announcerNames.length > 0) {
@@ -32,25 +30,23 @@ const ProgramInfo = ({ program }) => {
         } else if (announcerNames.length === 2) {
             formattedNames = announcerNames.join(' & ');
         } else {
-            const last = announcerNames.pop();
-            formattedNames = `${announcerNames.join(', ')} & ${last}`;
+            const last = announcerNames[announcerNames.length - 1];
+            const rest = announcerNames.slice(0, announcerNames.length - 1);
+            formattedNames = `${rest.join(', ')} & ${last}`;
         }
     }
 
-    // Não mostra nada se não houver locutor nem informação adicional
     if (!formattedNames && !program.additionalInfo) {
         return null;
     }
 
     return (
         <>
-            {/* Exibe o nome dos locutores, se houver */}
             {formattedNames && (
                 <p className="text-xl text-gray-300">
                     com {formattedNames}
                 </p>
             )}
-            {/* Exibe a informação adicional, se houver */}
             {program.additionalInfo && (
                 <p className="text-lg text-gray-400 mt-1 italic">
                     {program.additionalInfo}
@@ -69,25 +65,49 @@ function OnAirSection() {
 
     const findCurrentProgram = (programs) => {
         const now = new Date();
-        const dayMap = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-        const currentDay = dayMap[now.getDay()];
-        const currentTime = now.toTimeString().substring(0, 5);
+        const weekDayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const currentDayName = weekDayNames[now.getDay()];
 
         const activeProgram = programs.find(program => {
-            const programDays = parseDaysOfWeek(program.daysOfWeek);
-            if (!programDays.includes(currentDay)) return false;
-            return currentTime >= program.startTime.substring(0, 5) && currentTime < program.endTime.substring(0, 5);
+            const programDays = program.daysOfWeek.split(',').map(d => d.trim());
+            if (!programDays.includes(currentDayName)) {
+                return false;
+            }
+
+            if (!program.startTime || !program.endTime) {
+                return false;
+            }
+
+            // --- A CORREÇÃO DEFINITIVA: Comparação por minutos ---
+            const nowInMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            const [startHour, startMinute] = program.startTime.split(':').map(Number);
+            const startInMinutes = startHour * 60 + startMinute;
+
+            const [endHour, endMinute] = program.endTime.split(':').map(Number);
+            const endInMinutes = endHour * 60 + endMinute;
+
+            // Se o programa termina no dia seguinte (ex: 23:00 - 01:00)
+            if (endInMinutes < startInMinutes) {
+                // Duas condições possíveis:
+                // 1. O horário atual é DEPOIS do início (ex: 23:30)
+                // 2. O horário atual é ANTES do fim no dia seguinte (ex: 00:30)
+                return nowInMinutes >= startInMinutes || nowInMinutes < endInMinutes;
+            }
+
+            // Para programas que acontecem no mesmo dia
+            return nowInMinutes >= startInMinutes && nowInMinutes < endInMinutes;
         });
 
         setCurrentProgram(activeProgram);
     };
 
     useEffect(() => {
-        axios.get('/api/programas?size=100')
+        axios.get('/api/programas?size=200&sort=startTime,asc')
             .then(response => {
                 const allPrograms = response.data.content;
                 findCurrentProgram(allPrograms);
-                const intervalId = setInterval(() => findCurrentProgram(allPrograms), 60000);
+                const intervalId = setInterval(() => findCurrentProgram(allPrograms), 30000); // Verifica a cada 30 segundos
                 return () => clearInterval(intervalId);
             })
             .catch(error => console.error("Erro ao buscar a grade de programação!", error));
@@ -120,10 +140,11 @@ function OnAirSection() {
                 
                 setProgress(currentProgress);
             };
-
             updateProgress();
             const progressInterval = setInterval(updateProgress, 1000);
             return () => clearInterval(progressInterval);
+        } else {
+            setProgress(0);
         }
     }, [currentProgram]);
 
@@ -152,30 +173,6 @@ function OnAirSection() {
             )}
         </section>
     );
-}
-
-function parseDaysOfWeek(days) {
-    if (!days) return []; 
-    const phraseMap = {
-        'segunda a sexta': ['seg', 'ter', 'qua', 'qui', 'sex'],
-        'segunda a sábado': ['seg', 'ter', 'qua', 'qui', 'sex', 'sab'],
-        'segunda a quinta': ['seg', 'ter', 'qua', 'qui'],
-        'sexta-feira': ['sex'],
-        'sábado': ['sab'],
-        'domingo': ['dom'],
-    };
-    const dayAbbreviationMap = {
-        'Segunda': 'seg', 'Terça': 'ter', 'Quarta': 'qua', 'Quinta': 'qui',
-        'Sexta': 'sex', 'Sábado': 'sab', 'Domingo': 'dom'
-    };
-    const lowerDays = days.toLowerCase();
-    if (phraseMap[lowerDays]) {
-        return phraseMap[lowerDays];
-    }
-    const individualDays = days.split(',');
-    return individualDays
-        .map(day => dayAbbreviationMap[day.trim()])
-        .filter(Boolean);
 }
 
 export default OnAirSection;

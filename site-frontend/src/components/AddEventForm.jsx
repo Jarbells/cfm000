@@ -1,4 +1,4 @@
-// src/components/AddEventForm.jsx
+// site-frontend/src/components/AddEventForm.jsx
 
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -10,6 +10,7 @@ function AddEventForm({ onEventAdded }) {
         location: '',
         imageUrl: '',
         eventDate: '',
+        finishDate: '', // --- NOVO CAMPO ADICIONADO ---
     });
 
     const handleChange = (e) => {
@@ -19,17 +20,19 @@ function AddEventForm({ onEventAdded }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Converte a data local para o formato ISO (UTC) que o backend espera
         const dataToSend = {
             ...formData,
-            eventDate: new Date(formData.eventDate).toISOString()
+            // Converte a data de início para ISO se existir
+            eventDate: formData.eventDate ? new Date(formData.eventDate).toISOString() : null,
+            // Converte a data final para ISO se existir, senão envia null
+            finishDate: formData.finishDate ? new Date(formData.finishDate).toISOString() : null,
         };
 
         axios.post('/api/events', dataToSend)
             .then(() => {
                 alert('Evento cadastrado com sucesso!');
                 onEventAdded();
-                setFormData({ eventName: '', description: '', location: '', imageUrl: '', eventDate: '' });
+                setFormData({ eventName: '', description: '', location: '', imageUrl: '', eventDate: '', finishDate: '' });
             })
             .catch(error => {
                 console.error("Erro ao cadastrar evento!", error);
@@ -41,6 +44,7 @@ function AddEventForm({ onEventAdded }) {
         <div className="form-container">
             <h2>Adicionar Novo Evento</h2>
             <form onSubmit={handleSubmit}>
+                {/* ... (campos existentes) ... */}
                 <div className="form-group">
                     <label>Nome do Evento:</label>
                     <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} required />
@@ -50,9 +54,16 @@ function AddEventForm({ onEventAdded }) {
                     <input type="text" name="location" value={formData.location} onChange={handleChange} />
                 </div>
                 <div className="form-group">
-                    <label>Data e Hora do Evento:</label>
+                    <label>Data e Hora de Início do Evento:</label>
                     <input type="datetime-local" name="eventDate" value={formData.eventDate} onChange={handleChange} required />
                 </div>
+                
+                {/* --- NOVO CAMPO DE DATA FINAL --- */}
+                <div className="form-group">
+                    <label>Data e Hora Final (opcional, para eventos de vários dias):</label>
+                    <input type="datetime-local" name="finishDate" value={formData.finishDate} onChange={handleChange} />
+                </div>
+                
                 <div className="form-group">
                     <label>Descrição:</label>
                     <textarea name="description" value={formData.description} onChange={handleChange} rows="3" />
